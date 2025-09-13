@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Seven RJ - Calculadora Penal</title>
+<style>
+:root{--bg:#0d0d0d;--card:#1a1a1a;--accent:#3399ff;--muted:#2a2a2a;--text:#f2f2f2}
+body{font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;background:var(--bg);color:var(--text);margin:0;display:flex;flex-direction:column;min-height:100vh}
+.banner-topo{width:100%;height:180px;background-image:url("https://i.postimg.cc/fbcGxDqW/Design-sem-nome-29.png");background-size:cover;background-position:center}
+.titulo{text-align:center;margin:18px 0}
+.titulo h1{color:var(--accent);text-shadow:0 0 8px var(--accent),0 0 20px var(--accent);font-size:2.1rem;margin:0}
+
+/* Campos alinhados lado a lado */
+.campos {
+    max-width: 100%; 
+    margin: 8px auto 30px;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto; /* Scroll horizontal em telas pequenas */
+    padding-bottom: 4px;
+}
+.campos input {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: none;
+    background: var(--card);
+    color: var(--text);
+    flex: 0 0 220px; /* largura fixa */
+    box-shadow: 0 0 8px rgba(51,153,255,0.18);
+    outline: none;
+}
+.campos input:focus{box-shadow:0 0 12px var(--accent)}
+
+.main{display:grid;grid-template-columns:2fr 1fr;gap:20px;max-width:1400px;margin:0 auto;padding:0 20px;flex:1}
+.container{max-width:100%}
+.categoria{background:var(--card);margin-bottom:12px;border-radius:12px;box-shadow:0 0 10px rgba(51,153,255,0.1);overflow:hidden}
+.categoria-header{padding:12px 16px;cursor:pointer;font-weight:700;color:var(--accent);display:flex;justify-content:space-between;align-items:center;user-select:none}
+.categoria-body{display:none;padding:10px 16px 18px 16px;max-height:420px;overflow:auto}
+.categoria-body label{display:block;background:var(--muted);padding:10px;border-radius:8px;margin-bottom:8px;cursor:pointer;transition:background .12s;color:#eaeaea}
+.categoria-body label:hover{background:#2e2e2e}
+.categoria-body label input{margin-right:12px;transform:scale(1.03)}
+
+.sidebar{display:flex;flex-direction:column;gap:18px}
+.resultado,.selecionados,.reducoes{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 0 15px rgba(51,153,255,0.12)}
+.resultado h3,.selecionados h3,.reducoes h3{margin:0 0 8px 0;color:var(--accent)}
+#copiar,#limpar{padding:10px 16px;border-radius:8px;border:none;background:var(--accent);color:#000;font-weight:700;cursor:pointer}
+#copiar:hover,#limpar:hover{filter:brightness(.95)}
+.selecionados-lista{max-height:260px;overflow-y:auto;background:#0f0f0f;padding:10px;border-radius:8px;font-size:15px}
+.rodape{text-align:center;background:#111;padding:12px;font-size:14px;border-top:2px solid var(--accent);margin-top:auto}
+.rodape span{color:var(--accent)}
+.reducoes label{display:block;background:var(--muted);padding:8px;border-radius:8px;margin-bottom:6px;cursor:pointer;color:#eaeaea}
+.reducoes label input{margin-right:8px}
+@media (max-width:900px){.main{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="banner-topo"></div>
+<div class="titulo"><h1>⚖️ Seven RJ - Calculadora Penal</h1></div>
+
+<div class="campos">
+    <input id="rg" placeholder="RG" type="text" />
+    <input id="nome" placeholder="NOME" type="text" />
+    <input id="rgAdv" placeholder="RG ADVOGADO" type="text" />
+    <input id="nomeAdv" placeholder="NOME ADVOGADO" type="text" />
+</div>
+
+<div class="main">
+<div class="container">
+<!-- Aqui você mantém todas as categorias de crimes -->
+<!-- CRIMES DIVERSOS -->
+      <div class="categoria">
+        <div class="categoria-header">CRIMES DIVERSOS <span class="sign">+</span></div>
+        <div class="categoria-body">
+          <label><input type="checkbox" name="crime" value="101" data-pena="100" data-multa="100000">art. 101 - Azaralhamento Recrutamento</label>
+          <label><input type="checkbox" name="crime" value="101.1" data-pena="100" data-multa="100000">art. 101.1 - Prisão Militar</label>
+          <label><input type="checkbox" name="crime" value="102" data-pena="40" data-multa="50000">art. 102 - Agressão a Funcionário Público</label>
+          <label><input type="checkbox" name="crime" value="103" data-pena="100" data-multa="100000">art. 103 - Prevaricação</label>
+        </div>
+      </div>
+      <!-- CRIMES CONTRA A VIDA -->
+      <div class="categoria">
+        <div class="categoria-header">CRIMES CONTRA A VIDA <span class="sign">+</span></div>
+        <div class="categoria-body">
+          <label><input type="checkbox" name="crime" value="104" data-pena="40" data-multa="100000">art. 104 - Homicídio Doloso Qualificado</label>
+          <label><input type="checkbox" name="crime" value="105" data-pena="30" data-multa="75000">art. 105 - Homicídio Doloso</label>
+          <label><input type="checkbox" name="crime" value="106" data-pena="40" data-multa="100000">art. 106 - Tentativa de Homicídio</label>
+          <label><input type="checkbox" name="crime" value="107" data-pena="20" data-multa="50000">art. 107 - Homicídio Culposo</label>
+          <label><input type="checkbox" name="crime" value="108" data-pena="20" data-multa="45000">art. 108 - Homicídio Culposo no Trânsito</label>
+        </div>
+      </div>
+    <!-- CRIMES CONTRA DIREITOS FUNDAMENTAIS -->
+      <div class="categoria">
+        <div class="categoria-header">CRIMES CONTRA DIREITOS FUNDAMENTAIS <span class="sign">+</span></div>
+        <div class="categoria-body">
+          <label><input type="checkbox" name="crime" value="109" data-pena="40" data-multa="50000">art. 109 - Lesão Corporal</label>
+          <label><input type="checkbox" name="crime" value="110" data-pena="50" data-multa="200000">art. 110 - Sequestro</label>
+          <label><input type="checkbox" name="crime" value="111" data-pena="15" data-multa="50000">art. 111 - Cárcere Privado</label>
+        </div>
+      </div>
+      <!-- CRIMES CONTRA O PATRIMÔNIO -->
+      <div class="categoria">
+        <div class="categoria-header">CRIMES CONTRA O PATRIMÔNIO <span class="sign">+</span></div>
+        <div class="categoria-body">
+          <label><input type="checkbox" name="crime" value="112" data-pena="30" data-multa="25000">art. 112 - Desmanche de Veículos</label>
+          <label><input type="checkbox" name="crime" value="113" data-pena="35" data-multa="50000">art. 113 - Furto</label>
+          <label><input type="checkbox" name="crime" value="114" data-pena="35" data-multa="50000">art. 114 - Receptação de Veículos</label>
+          <label><input type="checkbox" name="crime" value="115" data-pena="15" data-multa="50000">art. 115 - Roubo de Veículos</label>
+          <label><input type="checkbox" name="crime" value="116" data-pena="10" data-multa="30000">art. 116 - Tentativa de Furto</label>
+          <label><input type="checkbox" name="crime" value="117" data-pena="15" data-multa="40000">art. 117 - Furto de Veículos</label>
+        </div>
+      </div>
+      <!-- CRIMES DE ROUBOS, FURTOS E SEUS VARIANTES -->
+      <div class="categoria">
+        <div class="categoria-header">CRIMES DE ROUBOS, FURTOS E SEUS VARIANTES <span class="sign">+</span></div>
+        <div class="categoria-body">
+          <label><input type="checkbox" name="crime" value="118" data-pena="40" data-multa="100000">art. 118 - Roubo</label>
+          <label><input type="checkbox" name="crime" value="119" data-pena="35" data-multa="50000">art. 119 - Furto a Caixa Eletrônico</label>
+          <label><input type="checkbox" name="crime" value="120" data-pena="40" data-multa="50000">art. 120 - Extorsão</label>
+        </div>
+      </div>
+      <!-- CRIMES DE PORTE, POSSE E TRÁFICO -->
+      <div class="categoria">
+        <div class="categoria-header">CRIMES DE PORTE, POSSE E TRÁFICO <span class="sign">+</span></div>
+        <div class="categoria-body">
+          <label><input type="checkbox" name="crime" value="121" data-pena="35" data-multa="50000">art. 121 - Posse de Peças de Armas</label>
+          <label><input type="checkbox" name="crime" value="122" data-pena="35" data-multa="50000">art. 122 - Posse de Cápsulas</label>
+          <label><input type="checkbox" name="crime" value="123" data-pena="60" data-multa="300000">art. 123 - Tráfico de Armas</label>
+          <label><input type="checkbox" name="crime" value="124" data-pena="35" data-multa="50000">art. 124 - Tráfico de Itens Ilegais</label>
+          <label><input type="checkbox" name="crime" value="125" data-pena="45" data-multa="200000">art. 125 - Porte de Arma Pesada</label>
+          <label><input type="checkbox" name="crime" value="126" data-pena="35" data-multa="100000">art. 126 - Porte de Arma Leve</label>
+          <label><input type="checkbox" name="crime" value="127" data-pena="40" data-multa="10000">art. 127 - Disparo de Arma de Fogo</label>
+          <label><input type="checkbox" name="crime" value="128" data-pena="20" data-multa="25000">art. 128 - Tráfico de Munições (+100)</label>
+          <label><input type="checkbox" name="crime" value="129" data-pena="40" data-multa="50000">art. 129 - Posse de Munição (-100)</label>
+          <label><input type="checkbox" name="crime" value="130" data-pena="20" data-multa="10000">art. 130 - Posse de Colete</label>
+          <label><input type="checkbox" name="crime" value="130.1" data-pena="50" data-multa="100000">art. 130.1 - Tráfico de equipamento balístico</label>
+          <label><input type="checkbox" name="crime" value="131" data-pena="0" data-multa="30000">art. 131 - Porte de Arma Branca</label>
+          <label><input type="checkbox" name="crime" value="132" data-pena="60" data-multa="100000">art. 132 - Tráfico de Drogas (+100)</label>
+          <label><input type="checkbox" name="crime" value="133" data-pena="35" data-multa="70000">art. 133 - Aviãozinho (6 a 100)</label>
+          <label><input type="checkbox" name="crime" value="134" data-pena="35" data-multa="50000">art. 134 - Posse de Componentes Narcóticos</label>
+          <label><input type="checkbox" name="crime" value="135" data-pena="0" data-multa="30000">art. 135 - Posse de Drogas (1 a 5)</label>
+          <label><input type="checkbox" name="crime" value="136" data-pena="35" data-multa="50000">art. 136 - Posse de Itens Ilegais</label>
+          <label><input type="checkbox" name="crime" value="137" data-pena="30" data-multa="500">art. 137 - Dinheiro Sujo</label>
+        </div>
+      </div>
+      <!-- CRIMES CONTRA A ORDEM PUBLICA -->
+      <div class="categoria">
+        <div class="categoria-header">CRIMES CONTRA A ORDEM PÚBLICA <span class="sign">+</span></div>
+        <div class="categoria-body">
+          <label><input type="checkbox" name="crime" value="138" data-pena="30" data-multa="125000">art. 138 - Falsidade Ideológica</label>
+          <label><input type="checkbox" name="crime" value="139" data-pena="30" data-multa="65000">art. 139 - Associação Criminosa</label>
+          <label><input type="checkbox" name="crime" value="140" data-pena="20" data-multa="100000">art. 140 - Apologia ao Crime</label>
+          <label><input type="checkbox" name="crime" value="141" data-pena="10" data-multa="25000">art. 141 - Posse de Arma em Público</label>
+          <label><input type="checkbox" name="crime" value="142" data-pena="25" data-multa="50000">art. 142 - Tentativa de Suborno</label>
+          <label><input type="checkbox" name="crime" value="143" data-pena="25" data-multa="50000">art. 143 - Ameaça</label>
+          <label><input type="checkbox" name="crime" value="144" data-pena="10" data-multa="15000">art. 144 - Falsa Comunicação de Crime</label>
+          <label><input type="checkbox" name="crime" value="145" data-pena="50" data-multa="50000">art. 145 - Desobediência 01</label>
+          <label><input type="checkbox" name="crime" value="146" data-pena="50" data-multa="50000">art. 146 - Desobediência 02</label>
+          <label><input type="checkbox" name="crime" value="147" data-pena="50" data-multa="50000">art. 147 - Desobediência 03</label>
+          <label><input type="checkbox" name="crime" value="148" data-pena="60" data-multa="150000">art. 148 - Assédio</label>
+          <label><input type="checkbox" name="crime" value="148.1" data-pena="60" data-multa="150000">art. 148.1 - Assédio Moral</label>
+          <label><input type="checkbox" name="crime" value="148.2" data-pena="20" data-multa="75000">art. 148.2 - Assédio Discriminatório</label>
+          <label><input type="checkbox" name="crime" value="148.3" data-pena="20" data-multa="75000">art. 148.3 - Assédio Virtual</label>
+          <label><input type="checkbox" name="crime" value="149" data-pena="50" data-multa="50000">art. 149 - Atentado ao Pudor</label>
+          <label><input type="checkbox" name="crime" value="150" data-pena="20" data-multa="50000">art. 150 - Vandalismo</label>
+          <label><input type="checkbox" name="crime" value="151" data-pena="15" data-multa="20000">art. 151 - Invasão de Propriedade</label>
+          <label><input type="checkbox" name="crime" value="152" data-pena="25" data-multa="50000">art. 152 - Abuso de Autoridade</label>
+          <label><input type="checkbox" name="crime" value="153" data-pena="25" data-multa="50000">art. 153 - Uso de Máscara</label>
+          <label><input type="checkbox" name="crime" value="154" data-pena="10" data-multa="50000">art. 154 - Uso de Equipamentos Restritos</label>
+          <label><input type="checkbox" name="crime" value="155" data-pena="10" data-multa="30000">art. 155 - Omissão de Socorro</label>
+          <label><input type="checkbox" name="crime" value="156" data-pena="35" data-multa="50000">art. 156 - Tentativa de Fuga</label>
+          <label><input type="checkbox" name="crime" value="157" data-pena="50" data-multa="150000">art. 157 - Desacato 01</label>
+          <label><input type="checkbox" name="crime" value="158" data-pena="50" data-multa="150000">art. 158 - Desacato 02</label>
+          <label><input type="checkbox" name="crime" value="159" data-pena="50" data-multa="150000">art. 159 - Desacato 03</label>
+          <label><input type="checkbox" name="crime" value="160" data-pena="20" data-multa="15000">art. 160 - Resistência a Prisão</label>
+          <label><input type="checkbox" name="crime" value="161" data-pena="10" data-multa="0">art. 161 - Réu Reincidente</label>
+          <label><input type="checkbox" name="crime" value="162" data-pena="0" data-multa="0">art. 162 - Cúmplice</label>
+          <label><input type="checkbox" name="crime" value="163" data-pena="20" data-multa="15000">art. 163 - Obstrução de Justiça</label>
+          <label><input type="checkbox" name="crime" value="164" data-pena="10" data-multa="25000">art. 164 - Ocultação de Provas</label>
+          <label><input type="checkbox" name="crime" value="165" data-pena="5" data-multa="10000">art. 165 - Vadiagem</label>
+          <label><input type="checkbox" name="crime" value="166" data-pena="10" data-multa="30000">art. 166 - Perturbação do Sossego Alheio</label>
+          <label><input type="checkbox" name="crime" value="167" data-pena="15" data-multa="30000">art. 167 - Calúnia, Injúria ou Difamação</label>
+        </div>
+      </div>
+      <!-- CRIMES DE TRÂNSITO -->
+      <div class="categoria">
+        <div class="categoria-header">CRIMES DE TRÂNSITO <span class="sign">+</span></div>
+        <div class="categoria-body">
+          <label><input type="checkbox" name="crime" value="168" data-pena="0" data-multa="40000">art. 168 - Condução Imprudente</label>
+          <label><input type="checkbox" name="crime" value="169" data-pena="0" data-multa="30000">art. 169 - Dirigir na Contra Mão</label>
+          <label><input type="checkbox" name="crime" value="170" data-pena="0" data-multa="25000">art. 170 - Alta Velocidade</label>
+          <label><input type="checkbox" name="crime" value="171" data-pena="0" data-multa="25000">art. 171 - Poluição Sonora</label>
+          <label><input type="checkbox" name="crime" value="172" data-pena="0" data-multa="25000">art. 172 - Corridas Ilegais</label>
+          <label><input type="checkbox" name="crime" value="173" data-pena="0" data-multa="30000">art. 173 - Uso Excessivo de Insulfilm</label>
+          <label><input type="checkbox" name="crime" value="174" data-pena="0" data-multa="25000">art. 174 - Veículo Muito Danificado</label>
+          <label><input type="checkbox" name="crime" value="175" data-pena="0" data-multa="25000">art. 175 - Veículo Ilegalmente Estacionado</label>
+          <label><input type="checkbox" name="crime" value="176" data-pena="0" data-multa="30000">art. 176 - Não Ceder Passagem a Viaturas</label>
+          <label><input type="checkbox" name="crime" value="177" data-pena="0" data-multa="30000">art. 177 - Impedir o Fluxo do Tráfego</label>
+          <label><input type="checkbox" name="crime" value="178" data-pena="15" data-multa="20000">art. 178 - Dano a Patrimônio Público</label>
+        </div>
+      </div>
+    </div><!-- /left container -->
+
+<div class="sidebar">
+<!-- REDUÇÕES -->
+<div class="reducoes">
+<h3>⚖️ Reduções</h3>
+<label><input type="checkbox" id="reuPrimario"> Réu primário (-30% da pena)</label>
+<label><input type="checkbox" id="advogado"> Advogado (-20% da pena / -20% da fiança)</label>
+<label><input type="checkbox" id="reuConfesso"> Réu confesso (-5% da pena)</label>
+</div>
+
+<!-- RESULTADO FINAL -->
+<div class="resultado">
+<h3>📋 Resultado Final:</h3>
+<div id="resultado">⏱️ Pena Total: <b>0 meses</b><br>💰 Multa Total: <b>R$ 0,00</b><br>🔓 Fiança Total: <b>Sem fiança</b></div>
+<div style="display:flex;gap:8px;margin-top:12px;">
+<button id="copiar">📋 Copiar Resultado</button>
+<button id="limpar">🧹 Limpar Seleções</button>
+</div>
+</div>
+
+<div class="selecionados">
+<h3>📌 Crimes Selecionados:</h3>
+<div class="selecionados-lista" id="lista-crimes">Nenhum crime selecionado.</div>
+</div>
+
+<div class="selecionados">
+<h3>📦 Itens Ilegais:</h3>
+<textarea id="itens-ilegais" placeholder="Digite aqui os itens ilegais encontrados..." style="width:100%;min-height:120px;background:#0f0f0f;color:var(--text);border:none;border-radius:8px;padding:10px;font-size:15px;resize:vertical;"></textarea>
+</div>
+</div>
+</div>
+
+<div class="rodape">© 2025 <span>Seven RJ</span> | Todos os direitos reservados</div>
+
+<script>
+const checkboxes = document.querySelectorAll('input[name="crime"]');
+const resultadoEl = document.getElementById('resultado');
+const listaCrimesEl = document.getElementById('lista-crimes');
+const copiarBtn = document.getElementById('copiar');
+const limparBtn = document.getElementById('limpar');
+const itensIlegaisEl = document.getElementById('itens-ilegais');
+
+function atualizarResultado() {
+    let pena = 0;
+    let multa = 0;
+    let multaReal = 0;
+    const selecionados = [];
+
+    checkboxes.forEach(cb => {
+        if(cb.checked){
+            const p = Number(cb.dataset.pena) || 0;
+            const m = Number(cb.dataset.multa) || 0;
+            pena += p;
+            multa += m;
+            multaReal += m;
+            selecionados.push(cb.parentElement.innerText.trim());
+        }
+    });
+
+    if(pena > 150) pena = 150;
+    if(multa > 500000) multa = 500000;
+
+    const reuPrimario = document.getElementById('reuPrimario').checked;
+    const advogado = document.getElementById('advogado').checked;
+    const reuConfesso = document.getElementById('reuConfesso').checked;
+
+    let penaFinal = pena;
+    let fiancaTotal = multaReal > 0 ? multaReal * 0.55 : 0;
+
+    if(reuPrimario) penaFinal *= 0.7; 
+    if(advogado){
+        penaFinal *= 0.8; 
+        fiancaTotal *= 0.8; 
+    }
+    if(reuConfesso) penaFinal *= 0.95; 
+
+    const fiancaAdv = fiancaTotal * 0.3;
+    const fiancaPolicia = fiancaTotal * 0.3;
+    const fiancaPainel = fiancaTotal * 0.4;
+
+    resultadoEl.innerHTML = `⏱️ Pena Total: <b>${Math.round(penaFinal)} meses</b><br>
+💰 Multa Total: <b>${multa.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</b><br>
+🔓 Fiança Total: <b>${fiancaTotal > 0 ? fiancaTotal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : 'Sem fiança'}</b><br>
+<p></p>
+<h3>➡️ Divisão da Fiança:</h3>
+👨‍⚖️ Advogado: <b>${fiancaTotal > 0 ? fiancaAdv.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : '-'}</b><br>
+👮 Polícia: <b>${fiancaTotal > 0 ? fiancaPolicia.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : '-'}</b><br>
+📊 Painel: <b>${fiancaTotal > 0 ? fiancaPainel.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : '-'}</b>`;
+
+    listaCrimesEl.innerHTML = selecionados.length ? selecionados.join('<br>') : 'Nenhum crime selecionado.';
+}
+
+checkboxes.forEach(cb => cb.addEventListener('change', atualizarResultado));
+document.getElementById('reuPrimario').addEventListener('change', atualizarResultado);
+document.getElementById('advogado').addEventListener('change', atualizarResultado);
+document.getElementById('reuConfesso').addEventListener('change', atualizarResultado);
+
+copiarBtn.addEventListener('click', async () => {
+    const nome = document.getElementById('nome').value.trim() || 'N/A';
+    const rg = document.getElementById('rg').value.trim() || 'N/A';
+    const adv = document.getElementById('rgAdv').value.trim() || 'N/A';
+    const nomeAdv = document.getElementById('nomeAdv').value.trim() || 'N/A';
+    const itens = itensIlegaisEl.value.trim();
+
+    let penaTotal = 0;
+    let multaTotal = 0;
+    let multaReal = 0;
+    const selecionados = [];
+
+    checkboxes.forEach(cb => {
+        if(cb.checked){
+            const p = Number(cb.dataset.pena) || 0;
+            const m = Number(cb.dataset.multa) || 0;
+            penaTotal += p;
+            multaTotal += m;
+            multaReal += m;
+            selecionados.push(cb.parentElement.innerText.trim());
+        }
+    });
+
+    if(penaTotal > 150) penaTotal = 150;
+
+    const reuPrimario = document.getElementById('reuPrimario').checked;
+    const advogado = document.getElementById('advogado').checked;
+    const reuConfesso = document.getElementById('reuConfesso').checked;
+
+    let penaFinal = penaTotal;
+    let fiancaTotal = multaReal > 0 ? multaReal * 0.55 : 0;
+
+    if(reuPrimario) penaFinal *= 0.7;
+    if(advogado){ penaFinal *= 0.8; fiancaTotal *= 0.8; }
+    if(reuConfesso) penaFinal *= 0.95;
+
+    const fiancaAdv = fiancaTotal * 0.3;
+    const fiancaPolicia = fiancaTotal * 0.3;
+    const fiancaPainel = fiancaTotal * 0.4;
+
+    let texto = `**⚖️ Seven RJ - Calculadora Penal**\n\n`;
+    texto += `**QRA:**\`\`\`\n`;
+    texto += `👤 NOME: ${nome}\n🆔 RG: ${rg}\n⚖️ RG ADVOGADO: ${adv}\n👨‍💼 Nome Advogado: ${nomeAdv}\n`;
+    texto += "-----------------------------------------------------------------\n\n";
+    texto += "📌 Crimes Selecionados:\n";
+    texto += selecionados.length ? selecionados.join("\n") + "\n\n" : "\n";
+    texto += "📦 Itens Ilegais:\n";
+    texto += itens ? itens + "\n\n" : "Nenhum item registrado.\n\n";
+    texto += "⚖️ Resultado Final:\n";
+    texto += `⏱️ Pena: ${Math.round(penaFinal)} meses\n`;
+    texto += `💰 Multa Original: ${multaReal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})} (multa máxima: R$ 500.000,00)\n`;
+    texto += `🔓 Fiança Total: ${fiancaTotal > 0 ? fiancaTotal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : 'Sem fiança'}\n`;
+    texto += "\n\n➡️ Divisão da Fiança: (caso haja)\n";
+    texto += `👨‍⚖️ Advogado: ${fiancaTotal > 0 ? fiancaAdv.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : '-'}\n`;
+    texto += `👮 Polícia: ${fiancaTotal > 0 ? fiancaPolicia.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : '-'}\n`;
+    texto += `📊 Painel: ${fiancaTotal > 0 ? fiancaPainel.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}) : '-'}\n`;
+    texto += "```";
+
+    try{
+        await navigator.clipboard.writeText(texto);
+        const original = copiarBtn.textContent;
+        copiarBtn.textContent = '✅ Copiado';
+        setTimeout(()=> copiarBtn.textContent = original, 1400);
+    } catch(e){
+        alert('Erro ao copiar para a área de transferência.');
+    }
+});
+
+limparBtn.addEventListener('click', () => {
+    checkboxes.forEach(cb => cb.checked = false);
+    document.getElementById('nome').value = '';
+    document.getElementById('rg').value = '';
+    document.getElementById('rgAdv').value = '';
+    document.getElementById('nomeAdv').value = '';
+    itensIlegaisEl.value = '';
+    document.getElementById('reuPrimario').checked = false;
+    document.getElementById('advogado').checked = false;
+    document.getElementById('reuConfesso').checked = false;
+    atualizarResultado();
+});
+
+document.querySelectorAll('.categoria-header').forEach(header=>{
+    header.addEventListener('click', () => {
+        const body = header.nextElementSibling;
+        const sign = header.querySelector('.sign');
+        const isOpen = body.style.display === 'block';
+        body.style.display = isOpen ? 'none' : 'block';
+        if(sign) sign.textContent = isOpen ? '+' : '−';
+    });
+});
+
+atualizarResultado();
+</script>
+</body>
+</html>
